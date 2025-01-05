@@ -1,0 +1,90 @@
+name: build
+
+on:
+  push:
+    tags:
+      - ghc-v[0-9]+.[0-9]+.[0-9]+
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Tag to be used for github release
+        required: true
+
+jobs:
+  set-env-variables:
+    runs-on: ubuntu-latest
+    outputs:
+      RELEASE_TAG: ${{ steps.env.outputs.RELEASE_TAG }}
+    steps:
+      - id: env
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            TAG="${GITHUB_REF#refs/*/}"
+          else
+            TAG="${{ github.event.inputs.release_tag }}"
+          fi
+          echo "::set-output name=RELEASE_TAG::${TAG}"
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: "/opt/termux/android-sdk"
+      NDK: "/opt/termux/android-ndk"
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+      fail-fast: false
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1000
+      - name: Build
+        run: |
+          mkdir ./out-dir 
+
+          # Process tag '%ci:no-build' that may be added as line to commit message.
+          # Forces CI to cancel current build with status 'passed'.
+          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
+            echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+            touch ./out-dir/placeholder.zip
+            exit 0
+          fi
+
+          ./run-docker.sh \
+              ./compile.sh ./out-dir ${{ matrix.target_arch }}
+
+      - name: Store files
+        uses: actions/upload-artifact@v3
+        with:
+          name: ghc-${{ matrix.target_arch }}
+          path: ./packages/out-dir/*
+
+  create-release:
+    needs:
+      - set-env-variables
+      - build
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+    steps:
+      # Must perform checkout first, since it deletes the target directory
+      # before running, and would therefore delete the downloaded artifacts
+      - uses: actions/checkout@v3
+
+      - name: Get files
+        uses: actions/download-artifact@v3
+
+      - name: Create new release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.set-env-variables.outputs.RELEASE_TAG }}
+        run: |
+          if gh release view "${RELEASE_TAG}"; then
+          # Release already exists. Update it:
+            echo "Updating release '${RELEASE_TAG}' ..."
+            gh release upload "${RELEASE_TAG}" ./ghc-*/*.xz --clobber
+          else
+            echo "Creating release '${RELEASE_TAG}' ..."
+            gh release create "${RELEASE_TAG}" ./ghc-*/*.xz
+          fi
