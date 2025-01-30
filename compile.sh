@@ -2,7 +2,7 @@
 
 set -e -u
 
-TAR_OUTPUT_DIR="$(realpath "$1")"
+export TAR_OUTPUT_DIR="$(realpath "$1")"
 ARCH="$2"
 
 source ./utils.sh
