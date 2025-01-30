@@ -36,7 +36,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1000
       - name: Build
@@ -55,7 +55,7 @@ jobs:
               ./compile.sh ./out-dir ${{ matrix.target_arch }}
 
       - name: Store files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ghc-${{ matrix.target_arch }}
           path: ./out-dir/*
@@ -70,10 +70,10 @@ jobs:
     steps:
       # Must perform checkout first, since it deletes the target directory
       # before running, and would therefore delete the downloaded artifacts
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create new release
         env:
