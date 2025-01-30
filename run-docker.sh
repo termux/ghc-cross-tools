@@ -7,7 +7,7 @@ UNAME=$(uname)
 REPOROOT="$(dirname $(readlink -f $0))"
 
 TERMUX_BUILDER_IMAGE_NAME="ghcr.io/termux/package-builder"
-CONTAINER_NAME="termux-package-builder"
+CONTAINER_NAME="termux-ghc-builder"
 
 USER=builder
 
