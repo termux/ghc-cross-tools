@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
 --with-system-libffi"
-
+TERMUX_PKG_BLACKLISTED_ARCH="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_post_get_source() {
