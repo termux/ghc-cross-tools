@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 1000
       - name: Build
         run: |
-          mkdir ./out-dir 
+          mkdir ./out-dir
 
           # Process tag '%ci:no-build' that may be added as line to commit message.
           # Forces CI to cancel current build with status 'passed'.
@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ghc-${{ matrix.target_arch }}
-          path: ./packages/out-dir/*
+          path: ./out-dir/*
 
   create-release:
     needs:
@@ -80,11 +80,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ needs.set-env-variables.outputs.RELEASE_TAG }}
         run: |
+          prerelease=""
+          if [[ "${RELEASE_TAG/+test/}" != "$RELEASE_TAG" ]]; then
+            prerelease="--prerelease"
+          fi
+
           if gh release view "${RELEASE_TAG}"; then
-          # Release already exists. Update it:
             echo "Updating release '${RELEASE_TAG}' ..."
             gh release upload "${RELEASE_TAG}" ./ghc-*/*.xz --clobber
           else
             echo "Creating release '${RELEASE_TAG}' ..."
-            gh release create "${RELEASE_TAG}" ./ghc-*/*.xz
+            gh release create "${RELEASE_TAG}" ./ghc-*/*.xz $prerelease
           fi
