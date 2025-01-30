@@ -32,7 +32,7 @@ jobs:
       NDK: "/opt/termux/android-ndk"
     strategy:
       matrix:
-        target_arch: [aarch64, arm, i686, x86_64]
+        target_arch: [aarch64, arm, x86_64]
       fail-fast: false
     steps:
       - name: Clone repository

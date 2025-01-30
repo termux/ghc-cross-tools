@@ -8,5 +8,4 @@ Build arch: x86_64
 
 - aarch64/arm64
 - arm/arm32
-- i686
 - x86_64
