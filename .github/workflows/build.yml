@@ -51,6 +51,7 @@ jobs:
             exit 0
           fi
 
+          ./free-space.sh
           ./run-docker.sh \
               ./compile.sh ./out-dir ${{ matrix.target_arch }}
 
