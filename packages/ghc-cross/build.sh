@@ -42,7 +42,8 @@ termux_step_pre_configure() {
 termux_step_make() {
   (
     unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
-    ./hadrian/build binary-dist-dir -j"$TERMUX_PKG_MAKE_PROCESSES" --flavour="$flavour" --docs=none
+    ./hadrian/build binary-dist-dir -j"$TERMUX_PKG_MAKE_PROCESSES" --flavour="$flavour" --docs=none \
+      "stage1.ghc-bin.ghc.link.opts += -optl-landroid-posix-semaphore"
   )
 }
 
