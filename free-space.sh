@@ -1,8 +1,27 @@
 #!/bin/sh
 
-sudo apt install ninja-build
-sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
-  firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
+sudo apt purge -yq \
+  $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php|llvm-') \
+  firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby \
+  azure-cli google-cloud-sdk hhvm powershell libgl1-mesa-dri
+
+# Directories
+sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
+sudo rm -rf /usr/local/graalvm/
+sudo rm -rf /usr/local/.ghcup/
+sudo rm -rf /usr/local/share/powershell
+sudo rm -rf /usr/local/share/chromium
+sudo rm -rf /usr/local/lib/android
+sudo rm -rf /usr/local/lib/node_modules
+
+https://github.com/actions/runner-images/issues/709#issuecomment-612569242
+sudo rm -rf "/usr/local/share/boost"
+sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+sudo docker image prune --all --force
+sudo docker builder prune -a
+
 sudo apt autoremove -yq
 sudo apt clean
-sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/local/share/boost /usr/share/dotnet /usr/share/swift
+
+df -h
