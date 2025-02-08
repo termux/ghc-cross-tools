@@ -11,7 +11,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
 --with-system-libffi
 --disable-ld-override"
-TERMUX_PKG_BLACKLISTED_ARCH="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_pre_configure() {
@@ -33,7 +32,11 @@ termux_step_pre_configure() {
 
   if [ "$TERMUX_ARCH" = "arm" ]; then
     target="armv7a-linux-androideabi"
-    flavour="${flavour}+no_profiled_libs" # Otherwise, build exceeds the 6 hours limit of github CI.
+    # Do not build profiled libs for `arm`. It exceeds the 6 hours limit of github CI.
+    flavour="${flavour}+no_profiled_libs"
+  elif [ "$TERMUX_ARCH" = "i686" ]; then
+    # WARNING: This should make it support `i686`, but it needs testing.
+    sed -i -E 's|"i686-unknown-linux"|"i686-unknown-linux-android"|' llvm-targets
   fi
 
   TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
