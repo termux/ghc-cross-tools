@@ -50,6 +50,11 @@ termux_step_make() {
 termux_step_make_install() {
   cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
 
+  # Package for external use:
+  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C .. ghc-"$TERMUX_PKG_VERSION"-"$target"
+
+  # Now we package for ourselves:
+  #
   # We need to re-run configure:
   # See: https://gitlab.haskell.org/ghc/ghc/-/issues/22058
   ./configure \
@@ -91,5 +96,5 @@ termux_step_post_massage() {
   find . -type f \( -name "*.so" -o -name "*.a" \) -exec "$STRIP" --strip-unneeded {} \;
   find "$ghclibs_dir"/bin -type f -exec "$STRIP" {} \;
 
-  tar cvzf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$TERMUX_ARCH".tar.xz lib/ bin/ share/ && exit 0
+  tar cJf "$TAR_OUTPUT_DIR"/termux-ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz lib/ bin/ share/ && exit 0
 }
