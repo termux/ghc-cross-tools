@@ -1,9 +1,13 @@
 #!/bin/sh
 
+echo "Listing 100 largest packages"
+dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+df -h
+
 sudo apt purge -yq \
   $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php|llvm-') \
   firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby \
-  azure-cli google-cloud-sdk hhvm powershell libgl1-mesa-dri
+  azure-cli powershell libgl1-mesa-dri
 
 # Directories
 sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
@@ -14,7 +18,7 @@ sudo rm -rf /usr/local/share/chromium
 sudo rm -rf /usr/local/lib/android
 sudo rm -rf /usr/local/lib/node_modules
 
-https://github.com/actions/runner-images/issues/709#issuecomment-612569242
+# https://github.com/actions/runner-images/issues/709#issuecomment-612569242
 sudo rm -rf "/usr/local/share/boost"
 sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
