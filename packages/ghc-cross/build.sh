@@ -50,31 +50,8 @@ termux_step_make() {
   )
 }
 
-termux_step_make_install() {
-  cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
-
-  # Package for external use:
-  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C .. ghc-"$TERMUX_PKG_VERSION"-"$target"
-
-  # Now we package for ourselves:
-  #
-  # We need to re-run configure:
-  # See: https://gitlab.haskell.org/ghc/ghc/-/issues/22058
-  ./configure \
-    --prefix="$TERMUX_PREFIX" \
-    --with-system-libffi \
-    --disable-ld-override \
-    --host="$target"
-
-  make install
-}
-
-termux_step_install_license() {
-  install -Dm600 -t "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" \
-    "$TERMUX_PKG_SRCDIR/LICENSE"
-}
-
-termux_step_post_massage() {
+__package() {
+  cd "$1" || exit
   # Remove cross-prefix from binaries and fix links:
   for path in bin/"$target"-*; do
     newpath="${path//$target-/}"
@@ -100,4 +77,36 @@ termux_step_post_massage() {
   find "$ghclibs_dir"/bin -type f -exec "$STRIP" {} \;
 
   tar cJf "$TAR_OUTPUT_DIR"/termux-ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz lib/ bin/ share/ && exit 0
+}
+
+termux_step_make_install() {
+  cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
+
+  # Package for external use:
+  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C .. ghc-"$TERMUX_PKG_VERSION"-"$target"
+
+  # Now we package for ourselves:
+
+  # WARNING: I'm assuming we will always setup this `ghc` at `$install_dir` (through termux_setup_ghc_cross_compiler).
+  # This path will be embedded to various wrappers and library configuration files.
+  # Modify it, if the latter is modified.
+  # PS: Why am I installing it here?
+  # - To de-clutter `termux_setup_ghc_cross_compiler`.
+  # - Otherwise, we would have to perform all steps in __package there.
+  #
+  # TODO: This should be in sync with <url>
+  local install_dir="$TERMUX_COMMON_CACHEDIR"/termux-ghc-"$TERMUX_PKG_VERSION"-"$TERMUX_ARCH"
+
+  mkdir -p "$install_dir"
+
+  # We need to re-run configure:
+  # See: https://gitlab.haskell.org/ghc/ghc/-/issues/22058
+  ./configure \
+    --prefix="$install_dir" \
+    --with-system-libffi \
+    --disable-ld-override \
+    --host="$target"
+
+  make install
+  __package "$install_dir"
 }
