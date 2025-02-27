@@ -9,9 +9,8 @@ TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
---with-system-libffi"
-TERMUX_PKG_BLACKLISTED_ARCH="i686"
-TERMUX_PKG_NO_STATICSPLIT=true
+--with-system-libffi
+--disable-ld-override"
 
 termux_step_pre_configure() {
   termux_setup_ghc && termux_setup_cabal
