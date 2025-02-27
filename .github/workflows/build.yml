@@ -14,20 +14,6 @@ on:
         required: true
 
 jobs:
-  set-env-variables:
-    runs-on: ubuntu-latest
-    outputs:
-      RELEASE_TAG: ${{ steps.env.outputs.RELEASE_TAG }}
-    steps:
-      - id: env
-        run: |
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            TAG="${GITHUB_REF#refs/*/}"
-          else
-            TAG="${{ github.event.inputs.release_tag }}"
-          fi
-          echo "::set-output name=RELEASE_TAG::${TAG}"
-
   build:
     runs-on: ubuntu-latest
     env:
@@ -67,7 +53,6 @@ jobs:
   create-release:
     if: github.event_name != "pull_request"
     needs:
-      - set-env-variables
       - build
     runs-on: "ubuntu-latest"
     permissions:
@@ -83,17 +68,20 @@ jobs:
       - name: Create new release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ needs.set-env-variables.outputs.RELEASE_TAG }}
         run: |
           prerelease=""
-          if [[ "${RELEASE_TAG/+test/}" != "$RELEASE_TAG" ]]; then
+          release_tag="${GITHUB_REF#refs/*/}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            release_tag="${{ github.event.inputs.release_tag }}"
+          fi
+          if [[ "${release_tag/+test/}" != "$release_tag" ]]; then
             prerelease="--prerelease"
           fi
 
-          if gh release view "${RELEASE_TAG}"; then
-            echo "Updating release '${RELEASE_TAG}' ..."
-            gh release upload "${RELEASE_TAG}" ./ghc-*/*.xz --clobber
+          if gh release view "$release_tag"; then
+            echo "Updating release '$release_tag' ..."
+            gh release upload "$release_tag" ./ghc-*/*.xz --clobber
           else
-            echo "Creating release '${RELEASE_TAG}' ..."
-            gh release create "${RELEASE_TAG}" ./ghc-*/*.xz $prerelease
+            echo "Creating release '$release_tag' ..."
+            gh release create "$release_tag" ./ghc-*/*.xz $prerelease
           fi
