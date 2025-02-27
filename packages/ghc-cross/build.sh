@@ -13,34 +13,39 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_BLACKLISTED_ARCH="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 
-termux_step_post_get_source() {
-  termux_setup_ghc && termux_setup_cabal
-  cabal update
-}
-
 termux_step_pre_configure() {
-  export CONF_CC_OPTS_STAGE1="$CFLAGS $CPPFLAGS" CONF_GCC_LINKER_OPTS_STAGE1="$LDFLAGS"
-  export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS" CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
+  termux_setup_ghc && termux_setup_cabal
 
-  export flavour="perf"
+  export CONF_CC_OPTS_STAGE1="$CFLAGS $CPPFLAGS"
+  export CONF_GCC_LINKER_OPTS_STAGE1="$LDFLAGS"
+  export CONF_CXX_OPTS_STAGE1="$CXXFLAGS"
 
-  target="$TERMUX_HOST_PLATFORM"
+  export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
+  export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
+  export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
+
+  export target="$TERMUX_HOST_PLATFORM"
+
+  # NOTE: We do not build profiled libs. It exceeds the 6 hours limit of github CI.
+  export flavour="release+split_sections+late_ccs+no_profiled_libs"
+
   if [ "$TERMUX_ARCH" = "arm" ]; then
     target="armv7a-linux-androideabi"
-    flavour+="+no_profiled_libs" # Otherwise takes more than 6 hrs to build.
   fi
-  TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --target=$target"
 
-  ./boot.source
+  TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
 }
 
 termux_step_make() {
   (
     unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
-    ./hadrian/build binary-dist-xz --flavour="$flavour" --docs=none \
-      "stage1.*.ghc.*.opts += -optl-landroid-posix-semaphore"
+    ./hadrian/build binary-dist-dir -j"$TERMUX_PKG_MAKE_PROCESSES" --flavour="$flavour" --docs=none \
+      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
   )
+}
 
-  cp ./_build/bindist/ghc-*.tar.xz "$TAR_OUTPUT_DIR"/
-  exit 0
+termux_step_make_install() {
+  cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
+  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C .. ghc-"$TERMUX_PKG_VERSION"-"$target"
+  exit
 }
