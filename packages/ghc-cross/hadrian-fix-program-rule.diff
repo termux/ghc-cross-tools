@@ -1,0 +1,17 @@
+--- ghc-9.12.1/hadrian/src/Rules/Program.hs	2025-02-24 22:46:43.666788988 +0530
++++ ghc-9.12.1.mod/hadrian/src/Rules/Program.hs	2025-02-26 23:01:57.610058317 +0530
+@@ -99,13 +99,7 @@
+   -- so we use pkgRegisteredLibraryFile instead.
+   registerPackages =<< contextDependencies ctx
+ 
+-  cross <- flag CrossCompiling
+-  -- For cross compiler, copy @stage0/bin/<pgm>@ to @stage1/bin/@.
+-  case (cross, stage) of
+-    (True, s) | s > stage0InTree -> do
+-        srcDir <- buildRoot <&> (-/- (stageString stage0InTree -/- "bin"))
+-        copyFile (srcDir -/- takeFileName bin) bin
+-    _ -> buildBinary rs bin ctx
++  buildBinary rs bin ctx
+ 
+ buildBinary :: [(Resource, Int)] -> FilePath -> Context -> Action ()
+ buildBinary rs bin context@Context {..} = do

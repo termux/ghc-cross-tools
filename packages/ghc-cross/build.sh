@@ -25,26 +25,38 @@ termux_step_pre_configure() {
 
   export target="$TERMUX_HOST_PLATFORM"
 
-  # NOTE: We do not build profiled libs. It exceeds the 6 hours limit of github CI.
-  export flavour="release+split_sections+late_ccs+no_profiled_libs"
-
-  if [ "$TERMUX_ARCH" = "arm" ]; then
-    target="armv7a-linux-androideabi"
-  fi
+  [[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
   TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
+
+  ./boot.source
 }
 
 termux_step_make() {
   (
     unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
-    ./hadrian/build binary-dist-dir -j"$TERMUX_PKG_MAKE_PROCESSES" --flavour="$flavour" --docs=none \
+
+    ./hadrian/build binary-dist-dir \
+      -j"$TERMUX_PKG_MAKE_PROCESSES" \
+      --flavour="perf" \
+      --docs=none \
       "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+
+    echo "===> Starting iserv build"
+
+    # Patch to build iserv:
+    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-iserv.diff
+    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
+
+    ./hadrian/build stage2:exe:iserv \
+      -j"$TERMUX_PKG_MAKE_PROCESSES" \
+      --flavour="perf" \
+      --docs=none
   )
 }
 
 termux_step_make_install() {
-  cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
-  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C .. ghc-"$TERMUX_PKG_VERSION"-"$target"
+  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
+  tar cJf "$TAR_OUTPUT_DIR"/iserv-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/stage1/bin "$target"-ghc-iserv
   exit
 }
