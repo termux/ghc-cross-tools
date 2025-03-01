@@ -1,11 +1,12 @@
 # About
 
-Haskell cross-compiler (GHC) targeting Android.
+Glasgow Haskell Cross-Compiler (ghc) targeting Android.
 
 Build arch: x86_64
 
-## Available for archs (Target archs)
+## Target archs:
 
-- aarch64/arm64
-- arm/arm32
+- aarch64
+- arm32
 - x86_64
+- i686
