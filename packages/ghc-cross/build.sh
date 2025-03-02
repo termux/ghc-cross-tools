@@ -49,6 +49,8 @@ termux_step_make() {
 
     # Patch to build iserv:
     patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-Stage2-iserv.diff
+    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
+
     ./hadrian/build stage2:exe:iserv \
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
       --flavour="$flavour" \
