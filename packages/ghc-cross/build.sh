@@ -38,13 +38,30 @@ termux_step_pre_configure() {
 termux_step_make() {
   (
     unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
-    ./hadrian/build binary-dist-dir -j"$TERMUX_PKG_MAKE_PROCESSES" --flavour="$flavour" --docs=none \
-      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+    #
+    # ./hadrian/build binary-dist-dir \
+    #   -j"$TERMUX_PKG_MAKE_PROCESSES" \
+    #   --flavour="$flavour" \
+    #   --docs=none \
+    #   "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+    #
+    echo "===> Starting iserv build"
+
+    # Patch to build iserv:
+    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-Stage2-iserv.diff
+    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
+
+    ./hadrian/build stage2:exe:iserv \
+      -j"$TERMUX_PKG_MAKE_PROCESSES" \
+      --flavour="$flavour" \
+      --docs=none \
+      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
+      "stage1.iserv.ghc.*.opts += -fPIE"
   )
 }
 
 termux_step_make_install() {
-  cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
-  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C .. ghc-"$TERMUX_PKG_VERSION"-"$target"
+  # tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
+  tar cJf "$TAR_OUTPUT_DIR"/iserv-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/stage1/bin "$target"-ghc-iserv
   exit
 }
