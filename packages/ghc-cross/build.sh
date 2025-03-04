@@ -48,7 +48,7 @@ termux_step_make() {
     echo "===> Starting iserv build"
 
     # Patch to build iserv:
-    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-Stage2-iserv.diff
+    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-iserv.diff
     patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
 
     ./hadrian/build stage3:exe:iserv \
