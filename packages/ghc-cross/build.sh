@@ -33,6 +33,8 @@ termux_step_pre_configure() {
   fi
 
   TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
+
+  ./boot.source
 }
 
 termux_step_make() {
