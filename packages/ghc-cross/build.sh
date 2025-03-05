@@ -26,7 +26,7 @@ termux_step_pre_configure() {
   export target="$TERMUX_HOST_PLATFORM"
 
   # NOTE: We do not build profiled libs. It exceeds the 6 hours limit of github CI.
-  export flavour="perf+split_sections+no_profiled_libs+host_fully_static"
+  export flavour="perf+split_sections+no_profiled_libs+fully_static"
 
   if [ "$TERMUX_ARCH" = "arm" ]; then
     target="armv7a-linux-androideabi"
