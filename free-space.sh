@@ -1,13 +1,13 @@
 #!/bin/sh
 
-df -h
+# df -h
 
 sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|llvm-|liblldb-|php)') \
   firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby \
   azure-cli powershell libgl1-mesa-dri shellcheck mercurial-common humanity-icon-theme google-cloud-cli
 
-echo "Listing 100 largest packages after"
-dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+# echo "Listing 100 largest packages after"
+# dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
 
 # Directories
 sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
@@ -28,4 +28,4 @@ sudo docker builder prune -a
 sudo apt autoremove -yq
 sudo apt clean
 
-df -h
+# df -h

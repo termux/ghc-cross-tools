@@ -1,0 +1,18 @@
+# This Stage2 iserv will run under qemu emulated proot.
+
+--- ghc-9.12.1/hadrian/src/Settings/Default.hs	2025-02-24 22:46:43.668323779 +0530
++++ ghc-9.12.1.mod/hadrian/src/Settings/Default.hs	2025-03-02 14:45:19.932865008 +0530
+@@ -171,12 +173,12 @@
+         , transformers
+         , unlit
+         , xhtml
++        , iserv
+         , if winTarget then win32 else unix
+         ]
+       , when (not cross)
+         [ haddock
+         , hpcBin
+-        , iserv
+         , runGhc
+         , ghcToolchainBin
+         ]
