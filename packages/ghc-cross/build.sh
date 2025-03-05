@@ -26,7 +26,7 @@ termux_step_pre_configure() {
   export target="$TERMUX_HOST_PLATFORM"
 
   # NOTE: We do not build profiled libs. It exceeds the 6 hours limit of github CI.
-  export flavour="release+split_sections+late_ccs+no_profiled_libs"
+  export flavour="perf+split_sections+no_profiled_libs+host_fully_static"
 
   if [ "$TERMUX_ARCH" = "arm" ]; then
     target="armv7a-linux-androideabi"
@@ -40,30 +40,29 @@ termux_step_pre_configure() {
 termux_step_make() {
   (
     unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
-    #
-    # ./hadrian/build binary-dist-dir \
-    #   -j"$TERMUX_PKG_MAKE_PROCESSES" \
-    #   --flavour="$flavour" \
-    #   --docs=none \
-    #   "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
-    #
-    echo "===> Starting iserv build"
 
-    # Patch to build iserv:
-    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-iserv.diff
-    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
-
-    ./hadrian/build stage2:exe:iserv \
+    ./hadrian/build binary-dist-dir \
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
       --flavour="$flavour" \
       --docs=none \
-      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
-      "stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+
+    echo "===> Starting iserv build"
+
+    # Patch to build iserv:
+    # patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-iserv.diff
+    # patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
+    #
+    # ./hadrian/build stage2:exe:iserv \
+    #   -j"$TERMUX_PKG_MAKE_PROCESSES" \
+    #   --flavour="$flavour" \
+    #   --docs=none \
+    #   "stage1.iserv.ghc.link.opts += -optl-static" || true
   )
 }
 
 termux_step_make_install() {
-  # tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
-  tar cJf "$TAR_OUTPUT_DIR"/iserv-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/stage1/bin "$target"-ghc-iserv
+  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
+  # tar cJf "$TAR_OUTPUT_DIR"/iserv-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/stage1/bin "$target"-ghc-iserv || true
   exit
 }
