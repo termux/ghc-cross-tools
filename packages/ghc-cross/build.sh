@@ -24,12 +24,9 @@ termux_step_pre_configure() {
   export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
 
   export target="$TERMUX_HOST_PLATFORM"
-
   [[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
   TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
-
-  ./boot.source
 }
 
 termux_step_make() {
@@ -38,7 +35,7 @@ termux_step_make() {
 
     ./hadrian/build binary-dist-dir \
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
-      --flavour="perf" \
+      --flavour="release+no_profiled_libs+split_sections" \
       --docs=none \
       "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
 
@@ -50,7 +47,7 @@ termux_step_make() {
 
     ./hadrian/build stage2:exe:iserv \
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
-      --flavour="perf" \
+      --flavour="release+no_profiled_libs+split_sections" \
       --docs=none
   )
 }
