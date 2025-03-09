@@ -35,7 +35,7 @@ termux_step_make() {
 
     ./hadrian/build binary-dist-dir \
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
-      --flavour="release+no_profiled_libs+split_sections" \
+      --flavour="perf+no_profiled_libs" \
       --docs=none \
       "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
 
@@ -47,7 +47,7 @@ termux_step_make() {
 
     ./hadrian/build stage2:exe:iserv \
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
-      --flavour="release+no_profiled_libs+split_sections" \
+      --flavour="perf+no_profiled_libs" \
       --docs=none
   )
 }
