@@ -37,23 +37,12 @@ termux_step_make() {
       -j"$TERMUX_PKG_MAKE_PROCESSES" \
       --flavour="perf+no_profiled_libs" \
       --docs=none \
-      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
-
-    echo "===> Starting iserv build"
-
-    # Patch to build iserv:
-    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-enable-iserv.diff
-    patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/hadrian-fix-program-rule.diff
-
-    ./hadrian/build stage2:exe:iserv \
-      -j"$TERMUX_PKG_MAKE_PROCESSES" \
-      --flavour="perf+no_profiled_libs" \
-      --docs=none
+      "stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
+      "stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
   )
 }
 
 termux_step_make_install() {
   tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
-  tar cJf "$TAR_OUTPUT_DIR"/iserv-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/stage1/bin "$target"-ghc-iserv
   exit
 }

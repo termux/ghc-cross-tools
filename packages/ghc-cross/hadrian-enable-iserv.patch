@@ -1,0 +1,13 @@
+# This Stage2 iserv will run under qemu emulated proot.
+
+--- ghc-9.12.1/hadrian/src/Settings/Default.hs	2025-02-24 22:46:43.668323779 +0530
++++ ghc-9.12.1.mod/hadrian/src/Settings/Default.hs	2025-03-19 22:06:35.337966131 +0530
+@@ -188,7 +188,7 @@
+ 
+ -- | Packages built in 'Stage2' by default. You can change this in "UserSettings".
+ stage2Packages :: Action [Package]
+-stage2Packages = stage1Packages
++stage2Packages = (<> [iserv]) <$> stage1Packages
+ 
+ -- | Packages that are built only for the testsuite.
+ testsuitePackages :: Action [Package]
