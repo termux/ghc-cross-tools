@@ -1,0 +1,12 @@
+--- ghc-9.12.1/rts/linker/Elf.c	2024-12-16 00:59:46.000000000 +0530
++++ ghc-9.12.1.mod/rts/linker/Elf.c	2026-07-05 15:19:00.000454840 +0530
+@@ -1286,6 +1286,9 @@
+        case COMPAT_R_386_NONE:                  break;
+        case COMPAT_R_386_32:   *pP = value;     break;
+        case COMPAT_R_386_PC32: *pP = value - P; break;
++       case COMPAT_R_386_GOTPC: *pP = (Elf_Addr)oc->info->got_start + A - P; break;
++       case COMPAT_R_386_PLT32: *pP = value - P; break;
++       case COMPAT_R_386_GOTOFF: *pP = S + A - (Elf_Addr)oc->info->got_start; break;
+ #        endif
+ 
+ #        if defined(arm_HOST_ARCH)
