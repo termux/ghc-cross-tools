@@ -1,0 +1,25 @@
+# This should fix the issue of unhandled relocation type 10:
+# Following issue arise while building cabal-install on i686:
+#```
+# ghc-iserv: /home/builder/.termux-build/_cache/ghc-cross-9.12.1-i686-runtime/lib/ghc-9.12.1/lib/i386-linux-ghc-9.12.1-inplace/ghc-prim-0.13.0-inplace/libHSghc-prim-0.13.0-inplace.a:
+# unhandled ELF relocation(Rel) type 10
+# ghc-iserv: Failed to lookup symbol: ghczmprim_GHCziTypes_ZMZN_closure
+# ghc-iserv: ^^ Could not load 'ghczmprim_GHCziCString_unpackCStringzh_closure', dependency unresolved. See top entry above.
+# ```
+
+--- ghc-9.12.1/rts/linker/Elf.c	2025-02-24 22:46:43.316386854 +0530
++++ ghc-9.12.1.mod/rts/linker/Elf.c	2025-03-21 03:06:10.756936335 +0530
+@@ -1285,6 +1285,13 @@
+ #        if defined(i386_HOST_ARCH)
+        case COMPAT_R_386_NONE:                  break;
+        case COMPAT_R_386_32:   *pP = value;     break;
++      /** Oracle docs: https://docs.oracle.com/cd/E19455-01/816-0559/6m71o2afp/index.html
++       * This relocation type resembles R_386_PC32, except it uses the address
++       * of the global offset table in its calculation. The symbol referenced
++       * in this relocation normally is _GLOBAL_OFFSET_TABLE_, which also
++       * instructs the link-editor to create the global offset table.
++       **/
++       case COMPAT_R_386_GOTPC: // GOT + A - P
+        case COMPAT_R_386_PC32: *pP = value - P; break;
+ #        endif
+ 
