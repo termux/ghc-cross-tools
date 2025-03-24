@@ -27,6 +27,7 @@ termux_step_pre_configure() {
   [[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
   TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
+  ./boot.source
 }
 
 termux_step_make() {
