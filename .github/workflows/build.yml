@@ -82,5 +82,5 @@ jobs:
             gh release upload "$release_tag" ./ghc-*/*.xz --clobber
           else
             echo "Creating release '$release_tag' ..."
-            gh release create "$release_tag" ./ghc-*/*.xz $prerelease
+            gh release create "$release_tag" ./ghc-*/*.xz $prerelease --notes-from-tag
           fi
