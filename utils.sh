@@ -2,8 +2,7 @@
 
 clone_termux_packages() {
   # clone termux-packages into container
-  #TODO: Remove test branch after merger of https://github.com/termux/termux-packages/pull/22991
-  git clone -b test-latest-ghc --single-branch https://github.com/termux/termux-packages.git
+  git clone -b master --single-branch https://github.com/termux/termux-packages.git
 }
 
 download() {
