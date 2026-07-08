@@ -76,6 +76,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-  tar cJf "$TAR_OUTPUT_DIR"/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
+  tar cJf "$TERMUX_SCRIPTDIR"/output/ghc-"$TERMUX_PKG_VERSION"-"$target".tar.xz -C _build/bindist ghc-"$TERMUX_PKG_VERSION"-"$target"
   exit
 }
