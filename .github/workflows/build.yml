@@ -41,7 +41,7 @@ jobs:
 
           git clone -b master --single-branch https://github.com/termux/termux-packages.git
           cp -r ./packages/ghc-cross termux-packages/packages/
-          cp termux-packages/packages/ghc/{always-use-pic,cabal-set-default-prefix,disable-no-pie,elf-types,fix-arch-check,gcc15-fix,hadrian-disable-speed-hack,hadrian-do-not-add-cross-prefix,llvm-21,rts-heap-reservation}.patch \
+          cp termux-packages/packages/ghc/{always-use-pic,cabal-set-default-prefix,disable-no-pie,elf-types,fix-arch-check,gcc15-fix,hadrian-disable-speed-hack,llvm-21,rts-heap-reservation}.patch \
           termux-packages/packages/ghc-cross/
 
           ./termux-packages/scripts/free-space.sh
