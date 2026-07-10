@@ -1,12 +1,16 @@
---- ghc-9.12.1/rts/linker/Elf.c	2024-12-16 00:59:46.000000000 +0530
-+++ ghc-9.12.1.mod/rts/linker/Elf.c	2026-07-05 15:19:00.000454840 +0530
-@@ -1286,6 +1286,9 @@
+# GOT32 and GOT32X is same for PIC.
+
+--- ghc-9.12.2/rts/linker/Elf.c	2025-03-13 00:55:18.000000000 +0530
++++ ghc-9.12.2.mod/rts/linker/Elf.c	2026-07-10 16:25:03.031717132 +0530
+@@ -1286,6 +1286,11 @@
         case COMPAT_R_386_NONE:                  break;
         case COMPAT_R_386_32:   *pP = value;     break;
         case COMPAT_R_386_PC32: *pP = value - P; break;
 +       case COMPAT_R_386_GOTPC: *pP = (Elf_Addr)oc->info->got_start + A - P; break;
 +       case COMPAT_R_386_PLT32: *pP = value - P; break;
 +       case COMPAT_R_386_GOTOFF: *pP = S + A - (Elf_Addr)oc->info->got_start; break;
++       case COMPAT_R_386_GOT32:
++       case COMPAT_R_386_GOT32X: *pP = (Elf_Addr)symbol->got_addr - (Elf_Addr)oc->info->got_start + A; break;
  #        endif
  
  #        if defined(arm_HOST_ARCH)
