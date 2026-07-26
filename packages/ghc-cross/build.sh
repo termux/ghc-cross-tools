@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
 TERMUX_PKG_VERSION=9.12.2
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
 TERMUX_PKG_SHA256=0e49cd5dde43f348c5716e5de9a5d7a0f8d68d945dc41cf75dfdefe65084f933
-TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore"
+TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, libandroid-utimes"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
@@ -66,7 +66,10 @@ termux_step_make() {
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
 			--flavour="release+split_sections$profiled_libs" \
 			--docs=none \
-			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
+			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_futimes=yes" \
+			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_lutimes=yes" \
+			"stage1.unix.ghc.link.opts += -optl-landroid-utimes"
 	)
 }
 
