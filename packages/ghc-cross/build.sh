@@ -64,8 +64,8 @@ termux_step_make() {
 
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
-			--flavour="release+split_sections$profiled_libs" \
-			--docs=none \
+			--flavour="release+split_sections$profiled_libs" --docs=none \
+			"stage1.rts.ghc.link.opts += -optl-Wl,-z,global" \
 			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
 			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_futimes=yes" \
 			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_lutimes=yes" \
