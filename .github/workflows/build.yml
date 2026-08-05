@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1000
       - name: Build
@@ -43,7 +43,7 @@ jobs:
           ./build-package.sh -I -a "${{ matrix.target_arch }}" ghc-cross
 
       - name: Store files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ghc-${{ matrix.target_arch }}
           path: ./termux-packages/output/*
@@ -58,10 +58,10 @@ jobs:
     steps:
       # Must perform checkout first, since it deletes the target directory
       # before running, and would therefore delete the downloaded artifacts
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Get files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
 
       - name: Create new release
         env:
