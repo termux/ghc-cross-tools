@@ -30,15 +30,6 @@ jobs:
           fetch-depth: 1000
       - name: Build
         run: |
-          # Process tag '%ci:no-build' that may be added as line to commit message.
-          # Forces CI to cancel current build with status 'passed'.
-          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
-            echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
-            mkdir -p termux-packages/output
-            touch termux-packages/output/placeholder.xz
-            exit 0
-          fi
-
           git clone -b master --single-branch https://github.com/termux/termux-packages.git
           cp -r ./packages/ghc-cross termux-packages/packages/
           cp termux-packages/packages/ghc/{always-use-pic,cabal-set-default-prefix,disable-no-pie,elf-types,fix-arch-check,gcc15-fix,hadrian-disable-speed-hack,llvm-21,rts-heap-reservation,unix-extra-libraries}.patch \
@@ -76,13 +67,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          prerelease=""
           release_tag="${GITHUB_REF#refs/*/}"
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             release_tag="${{ github.event.inputs.release_tag }}"
-          fi
-          if [[ "${release_tag/+test/}" != "$release_tag" ]]; then
-            prerelease="--prerelease"
           fi
 
           if gh release view "$release_tag"; then
@@ -90,5 +77,5 @@ jobs:
             gh release upload "$release_tag" ./ghc-*/*.xz --clobber
           else
             echo "Creating release '$release_tag' ..."
-            gh release create "$release_tag" ./ghc-*/*.xz $prerelease --notes-from-tag
+            gh release create "$release_tag" ./ghc-*/*.xz --notes-from-tag
           fi
