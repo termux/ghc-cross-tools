@@ -1,0 +1,102 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Aditya Alok",
+    "email": "alok@termux.dev",
+    "phone": "",
+    "description": "I'm a civil engineering student with a passion for system engineering. I have contributed to many open source projects since 2020. I am currently the maintainer of the GHC/Haskell ecosystem for the Termux project. I am currently working on making the Glasgow Haskell Compiler (GHC) run natively on Android, which involves patching various Android bionic libc quirks, dynamic linker restrictions, and other differentiating factors from a normal linux distribution.",
+    "webpageUrl": {
+      "url": "https://github.com/MrAdityaAlok"
+    }
+  },
+  "projects": [
+    {
+      "guid": "ghc-cross-tools",
+      "name": "Glasgow Haskell Compiler cross-compilation toolchain targeting Android",
+      "description": "This project builds and provides cross-compilation toolchains for GHC for all four Android architectures (aarch64, armv7a, x86_64, i686) with various downstream patches.",
+      "webpageUrl": {
+        "url": "https://github.com/termux/ghc-cross-tools"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/termux/ghc-cross-tools"
+      },
+      "licenses": [
+        "spdx:Apache-2.0",
+        "spdx:BSD-3-Clause"
+      ],
+      "tags": [
+        "haskell",
+        "ghc",
+        "android",
+        "compiler",
+        "cross-compilation",
+        "developer-tools",
+        "systems"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "github-sponsors",
+        "type": "other",
+        "address": "https://github.com/sponsors/MrAdityaAlok",
+        "description": "Pay via the GitHub Sponsors page."
+      },
+      {
+        "guid": "bank-transfer",
+        "type": "bank",
+        "address": "Details provided upon request",
+        "description": "Direct bank transfer"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "ghc-android-development",
+        "status": "active",
+        "name": "Make Android a Tier-1 supported platform by ghc",
+        "description": "Haskell/GHC on Android is currently available downstream in Termux through a lot of manual patching. My goal is to upstream these patches, build a proper CI for regression testing, and ultimately make Android a Tier-1 platform so people can build native Haskell apps for Android without fighting the toolchain.",
+        "amount": 350000,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": [
+          "github-sponsors",
+          "bank-transfer"
+        ],
+        "milestones": [
+          {
+            "title": "Phase 1: Android CI pipeline & regression suite",
+            "description": "Upstream won't accept patches if they can't test them. I will build a reproducible CI pipeline using containers, PRoot, and QEMU to compile GHC for Android targets and run the entire GHC test suite to catch regressions.",
+            "target_date": "2026-12-31"
+          },
+          {
+            "title": "Phase 2: Fix Hadrian & Prepare initial patches",
+            "description": "Make the Hadrian build system cross-compilation friendly for Android. Clean up the existing downstream patches (adding proper OS guards, docs, and tests) so they meet GHC's need and contribution standards, and send the first batch of merge requests.",
+            "target_date": "2027-05-30"
+          },
+          {
+            "title": "Phase 3: Make 'Android' a distinct platform across the GHC/Cabal ecosystem",
+            "description": "This is the long-term goal and requires significant effort. Android shouldn't just be treated as a flavor of Linux (due bionic libc, restrictive dynamic linker and locked down system). I will write patches across various distinct libraries, GHC itself, and the Cabal ecosystem to officially recognize and support 'android' as its own distinct derivative platform alongside 'linux'.",
+            "target_date": "2027-10-31"
+          }
+        ]
+      },
+      {
+        "guid": "general-sponsorship",
+        "status": "active",
+        "name": "General Goodwill Sponsorship",
+        "description": "Pay anything you wish to support my ongoing open-source work on Termux and the Haskell ecosystem.",
+        "amount": 0,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": [
+          "github-sponsors",
+          "bank-transfer"
+        ]
+      }
+    ]
+  }
+}
