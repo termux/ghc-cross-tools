@@ -61,7 +61,7 @@ See:
 > [!NOTE]
 > There are more not much significant patches. See at: <https://github.com/termux/termux-packages/blob/master/packages/ghc>
 
-### Termux specific libraries used
+## Termux specific libraries used
 
 They are either missing on older APIs or absent on Android.
 
